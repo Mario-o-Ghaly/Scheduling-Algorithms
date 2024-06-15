@@ -444,14 +444,11 @@ void test(){
         MLFQ_turnaroundTimes.push_back(avg_turnaroundTime);
         MLFQ_responseTimes.push_back(avg_responseTime);
         MLFQ_waitingTimes.push_back(avg_waitingTime);
-        break;
     }
-    cout << "\n\n";
-    cout << FCFS_responseTimes[0] << " " << RR_responseTimes[0] << " " <<  SJF_responseTimes[0] << " " <<  MLFQ_responseTimes[0] << "\n";
 
-    // to_csv("TurnaroundReport.csv", FCFS_turnaroundTimes, RR_turnaroundTimes, SJF_turnaroundTimes, MLFQ_turnaroundTimes);
-    // to_csv("ResponseReport.csv", FCFS_responseTimes, RR_responseTimes, SJF_responseTimes, MLFQ_responseTimes);
-    // to_csv("WaitingReport.csv", FCFS_waitingTimes, RR_waitingTimes, SJF_waitingTimes, MLFQ_waitingTimes);
+    to_csv("TurnaroundReport.csv", FCFS_turnaroundTimes, RR_turnaroundTimes, SJF_turnaroundTimes, MLFQ_turnaroundTimes);
+    to_csv("ResponseReport.csv", FCFS_responseTimes, RR_responseTimes, SJF_responseTimes, MLFQ_responseTimes);
+    to_csv("WaitingReport.csv", FCFS_waitingTimes, RR_waitingTimes, SJF_waitingTimes, MLFQ_waitingTimes);
 }
 
 
@@ -514,7 +511,7 @@ void userTest(){
 
 int main(){
     srand(time(NULL));
-    // userTest();
-    test();
+    userTest();
+    // test();
     return 0;
 }
