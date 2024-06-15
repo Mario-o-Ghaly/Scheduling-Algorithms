@@ -21,6 +21,7 @@ void FCFS(vector<proc> procs, float &avg_turnaroundTime, float &avg_responseTime
     int time = 0;
     for(int i = 0; i < procs.size(); ++i){
         if(time < procs[i].arrivalTime) time = procs[i].arrivalTime;
+        cout << "This is PID " << procs[i].PID << " at time " << time << "\n";
         procs[i].startTime = time;
         time += procs[i].CPUTime;
         procs[i].endTime = time;
@@ -34,9 +35,9 @@ void FCFS(vector<proc> procs, float &avg_turnaroundTime, float &avg_responseTime
     avg_turnaroundTime = total_turnaroundTime / procs.size();
     avg_responseTime = total_responseTime / procs.size();
     avg_waitingTime = total_waitingTime / procs.size();
-    cout<<"\n\nAverage Turn around time = "<<avg_turnaroundTime;
-    cout<<"\n\nAverage response time = "<<avg_responseTime;
-    cout<<"\n\nAverage waiting time = "<<avg_waitingTime;
+    cout<<"\nAverage Turn around time = "<<avg_turnaroundTime;
+    cout<<"\nAverage response time = "<<avg_responseTime;
+    cout<<"\nAverage waiting time = "<<avg_waitingTime;
 }
 
 
@@ -48,11 +49,12 @@ void SJF(vector<proc> procs, float &avg_turnaroundTime, float &avg_responseTime,
 
     sort(procs.begin(), procs.end(), sort_arrival);
     map<int, proc> processes; //create a map of proccesses by its PID
-    map<int, vector<int>> CPUTime, arrivalTime;  //retrieve pid by cputime or arrivaltime
+    map<int, vector<int>> CPUTime, arrivalTime, zeft;  //retrieve pid by cputime or arrivaltime
     for(int i = 0; i < procs.size(); ++i){
         procs[i].startTime = -1;  //initialization to distinguish whether the process has started
         processes[procs[i].PID] = procs[i]; 
         arrivalTime[procs[i].arrivalTime].push_back(procs[i].PID); 
+        zeft[procs[i].arrivalTime].push_back(procs[i].PID); 
     }
 
     auto T_arrive = arrivalTime.begin();
@@ -64,11 +66,12 @@ void SJF(vector<proc> procs, float &avg_turnaroundTime, float &avg_responseTime,
     
     int PID = CPUTime.begin()->second.back();  
     auto curproc = &processes[PID];
+    bool finished = false;
 
     do {
         // cout<<"size = "<<CPUTime.size()<<"\n";
         //set the current PID to the shortest job that has come at the end of the vec
-        PID = CPUTime.begin()->second.back();  
+        PID = CPUTime.begin()->second.back();
         curproc = &processes[PID];
         cout<<"This is PID: "<<PID<<" at time "<<time<<" with CPUTime "<<curproc->CPUTime<<"\n";
         if(curproc->startTime == -1){ 
@@ -99,32 +102,16 @@ void SJF(vector<proc> procs, float &avg_turnaroundTime, float &avg_responseTime,
                     total_turnaroundTime += (curproc->endTime - curproc->arrivalTime);
                     total_waitingTime += ( (curproc->endTime - curproc->arrivalTime) - curproc->savedBurstTime );
                 }
-
                 //loop on the vector of PIDs that has arrived to put it in the CPUTime map
                 for(auto pid : T_arrive->second){ 
                     CPUTime[processes[pid].CPUTime].push_back(pid);
                 }
-
             }
-
-            else{ //no premption, just the job finished
-                //update time
-                time += curproc->CPUTime;
-                --T_arrive; //as it has not happened yet
-                
-                //remove process from the CPUTime to be updated
-                CPUTime[curproc->CPUTime].pop_back();
-                //if this is the last process with this CPUTime, delete the key
-                if(CPUTime[curproc->CPUTime].empty()) CPUTime.erase((curproc->CPUTime)); 
-
-                curproc->CPUTime = 0;
-                curproc->endTime = time;
-                total_turnaroundTime += (curproc->endTime - curproc->arrivalTime);
-                total_waitingTime += ( (curproc->endTime - curproc->arrivalTime) - curproc->savedBurstTime );
-            }
+            else finished = true;
         }
 
-        else{ //no premption, just the job finished
+        if(T_arrive == arrivalTime.end() || finished){  //no premption, just the job finished
+            finished = false;
             //update time
             time += curproc->CPUTime;
             --T_arrive; //as it has not happened yet
@@ -185,15 +172,11 @@ void RR (vector<proc> procs, int quantum, float &avg_turnaroundTime, float &avg_
         // in case there is a big gap between processes and for initialization
         processes.push(procs[id++]);
         time = processes.front().arrivalTime;
-        while(id < procs.size() && procs[id].arrivalTime <= time + quantum){
-            processes.push(procs[id++]);
-        }
         while(!processes.empty()){
             // give the CPU to the front scheduled process
             curproc = processes.front();
             processes.pop();
             cout<<"This is PID "<<curproc.PID<<" at time "<<time<<"\n";
-            // cout<<"This is PID: "<<curproc.PID<<" at time "<<time<<"\n";
 
             //update startTime
             if(curproc.startTime == -1){
@@ -211,14 +194,15 @@ void RR (vector<proc> procs, int quantum, float &avg_turnaroundTime, float &avg_
                 }
                 curproc.CPUTime = 0; //for meaning purposes nothing special here
                 curproc.endTime = time;
+                // cout << "PID " << curproc.PID << " ended at " << time << "\n";
                 total_turnaroundTime += (curproc.endTime - curproc.arrivalTime);
-                total_waitingTime += ( (curproc.endTime - curproc.arrivalTime) - curproc.savedBurstTime );
+                total_waitingTime += ( (curproc.endTime - curproc.arrivalTime) - curproc.savedBurstTime);
             }
             else {
-                processes.push(curproc);
                 while(id < procs.size() && procs[id].arrivalTime <= time){  //push processes arrived to the queue
                     processes.push(procs[id++]);
                 }
+                processes.push(curproc);
             }
         }
     }
@@ -226,95 +210,127 @@ void RR (vector<proc> procs, int quantum, float &avg_turnaroundTime, float &avg_
     avg_turnaroundTime = total_turnaroundTime / procs.size();
     avg_responseTime = total_responseTime / procs.size();
     avg_waitingTime = total_waitingTime / procs.size();
-    // cout<<"\nAverage Turn around time = "<<avg_turnaroundTime;
-    // cout<<"\nAverage response time = "<<avg_responseTime;
-    // cout<<"\nAverage waiting time = "<<avg_waitingTime;
+    cout<<"\nAverage Turn around time = "<<avg_turnaroundTime;
+    cout<<"\nAverage response time = "<<avg_responseTime;
+    cout<<"\nAverage waiting time = "<<avg_waitingTime;
 }
 
-void MLFQ(vector<proc> procs, float &avgTurnAroundTime, float &avgResponseTime, float &avgWaitingTime) {
-    int nProc = procs.size(), curTime = 0, procsScheduled = 0;
+
+void MLFQ(vector<proc> procs, int quantum0, int quantum1,  float &avg_turnaroundTime, float &avg_responseTime, float &avg_waitingTime){
+    float total_turnaroundTime = 0;
+    float total_responseTime = 0;
+    float total_waitingTime = 0;
+
     sort(procs.begin(), procs.end(), sort_arrival);
-    unordered_map<int,int> waitingTime, responseTime, lastExit, remainingBurstTime;
-    deque<proc> q0, q1, q2;
-    for (auto u : procs)  q0.emplace_back(u);
-    for (auto u : procs) waitingTime[u.PID] = -u.arrivalTime;
-    while (procsScheduled < nProc) {
-        proc curProc = q0.front();
-        while (curProc.arrivalTime <= curTime && !q0.empty()) {
-            curProc = q0.front();
-            if (curProc.arrivalTime > curTime) break;
-            int execTime = min(QUANTUM_0, curProc.CPUTime);
-            cout<<"This is PID "<<curProc.PID<<" at time "<<curTime<<"\n";
-            waitingTime[curProc.PID] += curTime - lastExit[curProc.PID];// - curProc.arrivalTime;
-            if (lastExit[curProc.PID] == 0) responseTime[curProc.PID] = curTime - curProc.arrivalTime;
-            curTime += execTime;
-            lastExit[curProc.PID] = curTime;
-            curProc.CPUTime -= execTime;
-            q0.pop_front();
-            if (curProc.CPUTime > 0) q1.emplace_back(curProc);
-            else procsScheduled++;
-            if (q0.empty()) break;
-            if (q0.front().arrivalTime > curTime && curProc.CPUTime > 0) q0.emplace_front(curProc), q1.pop_back();
-        }
-        curProc = q1.front();
-        while (curProc.arrivalTime <= curTime && !q1.empty()) {
-            curProc = q1.front();
-            if (curProc.arrivalTime > curTime) break;
-            int execTime = min(QUANTUM_1, curProc.CPUTime);
-            cout<<"This is PID "<<curProc.PID<<" at time "<<curTime<<"\n";
-            waitingTime[curProc.PID] += curTime - lastExit[curProc.PID];// - curProc.arrivalTime;
-            // if (lastExit[curProc.PID] == 0) responseTime[curProc.PID] = curTime - curProc.arrivalTime;
-            curTime += execTime;
-            lastExit[curProc.PID] = curTime;
-            // q0.front().CPUTime -= execTime;
-            curProc.CPUTime -= execTime;
-            q1.pop_front();
-            if (curProc.CPUTime > 0) q2.emplace_back(curProc);
-            else procsScheduled++;
-            if (q1.empty()) break;
-            if (q1.front().arrivalTime > curTime && curProc.CPUTime > 0) q1.emplace_front(curProc), q2.pop_back();
-        }
-        while (!q2.empty()) {
-            proc curProc = q2.front();
-            cout<<"This is PID "<<curProc.PID<<" at time "<<curTime<<"\n";
-            waitingTime[curProc.PID] += curTime - lastExit[curProc.PID];// - curProc.arrivalTime;
-            curTime += curProc.CPUTime;
-            q2.pop_front();
-            procsScheduled++;
+    queue <proc> q0, q1;
+    for(int i = 0; i < procs.size(); ++i){
+        procs[i].startTime = -1;
+    }
+
+    int time = 0, id = 0;
+
+    proc curproc;
+    while(id < procs.size()){
+        // in case there is a big gap between processes and for initialization
+        q0.push(procs[id++]);
+        time = q0.front().arrivalTime;
+        while(!q0.empty() || !q1.empty()){
+            while(!q0.empty()){
+                // give the CPU to the front scheduled process
+                curproc = q0.front();
+                q0.pop();
+                cout<<"This is PID "<<curproc.PID<<" at queue 0 at time "<<time<<"\n";
+
+                //update startTime
+                if(curproc.startTime == -1){
+                    curproc.startTime = time;
+                    total_responseTime += (curproc.startTime - curproc.arrivalTime);
+                }
+                
+                curproc.CPUTime -= quantum0; 
+                time += quantum0;
+
+                if(curproc.CPUTime <= 0){  //finished
+                    time += curproc.CPUTime;
+                    while(id < procs.size() && procs[id].arrivalTime <= time){  //push processes arrived to queue0
+                        q0.push(procs[id++]);
+                    }
+                    curproc.CPUTime = 0;  //for meaning purposes nothing special here
+                    curproc.endTime = time;
+                    total_turnaroundTime += (curproc.endTime - curproc.arrivalTime);
+                    total_waitingTime += ( (curproc.endTime - curproc.arrivalTime) - curproc.savedBurstTime);
+                }
+                else {
+                    while(id < procs.size() && procs[id].arrivalTime <= time){  //push processes arrived to queue0
+                        q0.push(procs[id++]);
+                    }
+                    q1.push(curproc);  //send it to queue1
+                }
+            }
+
+            while(!q1.empty()){
+                curproc = q1.front();
+                q1.pop();
+                cout<<"This is PID "<<curproc.PID<<" at queue 1 at time "<<time<<"\n";
+
+                curproc.CPUTime -= quantum1; 
+                time += quantum1;
+
+                if(curproc.CPUTime <= 0){  //finished
+                    time += curproc.CPUTime;
+                    while(id < procs.size() && procs[id].arrivalTime <= time){  //push processes arrived to queue0
+                        q0.push(procs[id++]);
+                    }
+                    curproc.CPUTime = 0;  //for meaning purposes nothing special here
+                    curproc.endTime = time;
+
+                    total_turnaroundTime += (curproc.endTime - curproc.arrivalTime);
+                    total_waitingTime += ( (curproc.endTime - curproc.arrivalTime) - curproc.savedBurstTime);
+                }
+                else {
+                    while(id < procs.size() && procs[id].arrivalTime <= time){  //push processes arrived to queue0
+                        q0.push(procs[id++]);
+                    }
+                    q1.push(curproc);
+                }
+                break;
+            }
         }
     }
 
-    for (auto u : waitingTime) avgWaitingTime += u.second;
-    avgTurnAroundTime = avgWaitingTime;
-    avgWaitingTime /= nProc;
-    for (auto u : procs) avgTurnAroundTime += u.CPUTime;
-    avgTurnAroundTime /= nProc;
-    for (auto u : responseTime) avgResponseTime += u.second;
-    avgResponseTime /= nProc;
-    // cout << avgWaitingTime << "," << avgResponseTime << "," << avgTurnAroundTime << "\n";
-
+    avg_turnaroundTime = total_turnaroundTime / procs.size();
+    avg_responseTime = total_responseTime / procs.size();
+    avg_waitingTime = total_waitingTime / procs.size();
+    cout<<"\nAverage Turn around time = "<<avg_turnaroundTime;
+    cout<<"\nAverage response time = "<<avg_responseTime;
+    cout<<"\nAverage waiting time = "<<avg_waitingTime;
 }
+
 
 void set_procs(vector<proc>& procs){
-    // for(int i = 0; i < procs.size(); ++i){
-    //     procs[i].PID = i;
-    //     procs[i].arrivalTime = rand() % 10;
-    //     procs[i].CPUTime = rand() % 10 + 1; //not to be zero
-    //     procs[i].savedBurstTime = procs[i].CPUTime;
-    // }
-    procs[0].PID = 0;
-    procs[0].arrivalTime = 0;
-    procs[0].CPUTime = 4;
-    procs[0].savedBurstTime = procs[0].CPUTime;
-    procs[1].PID = 1;
-    procs[1].arrivalTime = 3;
-    procs[1].CPUTime = 1;
-    procs[1].savedBurstTime = procs[1].CPUTime;
-    procs[2].PID = 2;
-    procs[2].arrivalTime = 20;
-    procs[2].CPUTime = 3;
-    procs[2].savedBurstTime = procs[2].CPUTime;
-}
+    for(int i = 0; i < procs.size(); ++i){
+        procs[i].PID = i;
+        procs[i].arrivalTime = rand() % 10;
+        procs[i].CPUTime = rand() % 10 + 1; //not to be zero
+        procs[i].savedBurstTime = procs[i].CPUTime;
+    }
+    // procs[0].PID = 0;
+    // procs[0].arrivalTime = 0;
+    // procs[0].CPUTime = 53;
+    // procs[0].savedBurstTime = procs[0].CPUTime;
+    // procs[1].PID = 1;
+    // procs[1].arrivalTime = 0;
+    // procs[1].CPUTime = 8;
+    // procs[1].savedBurstTime = procs[1].CPUTime;
+    // procs[2].PID = 2;
+    // procs[2].arrivalTime = 0;
+    // procs[2].CPUTime = 68;
+    // procs[2].savedBurstTime = procs[2].CPUTime;
+    // procs[3].PID = 3;
+    // procs[3].arrivalTime = 0;
+    // procs[3].CPUTime = 24;
+    // procs[3].savedBurstTime = procs[3].CPUTime;
+    }
 
 
 void to_csv(string filename, const vector<float>& one, const vector<float>& two, const vector<float>& three, const vector<float>& four) {
@@ -411,7 +427,7 @@ void test(){
         //
         avg_turnaroundTime = 0, avg_responseTime = 0, avg_waitingTime = 0;
         for(int j = 0; j < 11; ++j){
-            MLFQ(procs, avg_turnaroundTime, avg_responseTime, avg_waitingTime);
+            MLFQ(procs, QUANTUM_0, QUANTUM_1, avg_turnaroundTime, avg_responseTime, avg_waitingTime);
             read1.push_back(avg_turnaroundTime);
             read2.push_back(avg_responseTime);
             read3.push_back(avg_waitingTime);
@@ -428,24 +444,77 @@ void test(){
         MLFQ_turnaroundTimes.push_back(avg_turnaroundTime);
         MLFQ_responseTimes.push_back(avg_responseTime);
         MLFQ_waitingTimes.push_back(avg_waitingTime);
+        break;
+    }
+    cout << "\n\n";
+    cout << FCFS_responseTimes[0] << " " << RR_responseTimes[0] << " " <<  SJF_responseTimes[0] << " " <<  MLFQ_responseTimes[0] << "\n";
+
+    // to_csv("TurnaroundReport.csv", FCFS_turnaroundTimes, RR_turnaroundTimes, SJF_turnaroundTimes, MLFQ_turnaroundTimes);
+    // to_csv("ResponseReport.csv", FCFS_responseTimes, RR_responseTimes, SJF_responseTimes, MLFQ_responseTimes);
+    // to_csv("WaitingReport.csv", FCFS_waitingTimes, RR_waitingTimes, SJF_waitingTimes, MLFQ_waitingTimes);
+}
+
+
+void userTest(){
+    int n, a, b, c, q0, q1;
+    cout << "Please choose which algorithm you want to simulate by entering its number:\n1. FCFS\n2. SRTF\n3. RR\n4. MLFQ\n";
+    while(true){
+        cin >> c;
+        if (c < 1 || c > 4){
+            cout << "Invalid choice. Please try again: ";
+            continue;
+        }
+        break;
+    }
+    if(c == 3){
+        cout << "Enter Quantum value: ";
+        cin >> q0;
+    }
+    if(c == 4){
+        cout << "Enter Quantum 0 value: ";
+        cin >> q0;        
+        cout << "Enter Quantum 1 value: ";
+        cin >> q1;
+    }
+    cout << "Please Enter the number of processes: ";
+    cin >> n;
+    vector<proc> procs(n);
+    cout << "Enter the following input comma separated please\n\n";
+    for(int i = 0; i < n; ++i){
+        procs[i].PID = i + 1;
+        cout << "For PID " << i + 1 << ", enter Arrival Time and Burst Time: ";
+        cin >> a >> b;
+        procs[i].arrivalTime = a;
+        procs[i].CPUTime = b;
+        procs[i].savedBurstTime = b;
     }
 
-    to_csv("TurnaroundReport.csv", FCFS_turnaroundTimes, RR_turnaroundTimes, SJF_turnaroundTimes, MLFQ_turnaroundTimes);
-    to_csv("ResponseReport.csv", FCFS_responseTimes, RR_responseTimes, SJF_responseTimes, MLFQ_responseTimes);
-    to_csv("WaitingReport.csv", FCFS_waitingTimes, RR_waitingTimes, SJF_waitingTimes, MLFQ_waitingTimes);
+    float avg_turnaroundTime = 0, avg_responseTime = 0, avg_waitingTime = 0;
+    switch (c)
+    {
+    case 1:
+        FCFS(procs, avg_turnaroundTime, avg_responseTime, avg_waitingTime);
+        break;
+    case 2:
+        SJF(procs, avg_turnaroundTime, avg_responseTime, avg_waitingTime);
+        break;  
+    case 3:
+        RR(procs, q0, avg_turnaroundTime, avg_responseTime, avg_waitingTime);
+        break;
+
+    case 4:
+        MLFQ(procs, q0, q1, avg_turnaroundTime, avg_responseTime, avg_waitingTime);
+        break;
+    }
+    // RR(procs, 1, avg_turnaroundTime, avg_responseTime, avg_waitingTime);
+    // SJF(procs, avg_turnaroundTime, avg_responseTime, avg_waitingTime);
+    // MLFQ(procs, QUANTUM_0, QUANTUM_1, avg_turnaroundTime, avg_responseTime, avg_waitingTime);
 }
+
 
 int main(){
     srand(time(NULL));
-    // test();
-    // srand((2));
-    vector<proc> procs(3);
-    set_procs(procs);
-    float avg_turnaroundTime = 0, avg_responseTime = 0, avg_waitingTime = 0;
-    SJF(procs, avg_turnaroundTime, avg_responseTime, avg_waitingTime);
-    // MLFQ(procs, avg_turnaroundTime, avg_responseTime, avg_waitingTime);
-
-    // SJF(procs);
-    // RR(procs, QUANTUM);
+    // userTest();
+    test();
     return 0;
 }
