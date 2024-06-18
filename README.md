@@ -3,8 +3,6 @@
 This project implements and simulates various CPU scheduling algorithms in **C++**. The implemented algorithms include First-Come, First-Serve (FCFS), Shortest Remaining Time First (SRTF), Round Robin (RR) with a quantum of 8, and Multi-Level Feedback Queue (MLFQ) with two levels (quantums of 8 and 16).
 
 ## Table of Contents
-- [Introduction](#introduction)
-
 - [Description](#Description)
 - [Algorithms Implemented](#Algorithms Implemented)
 - [Implementation Details](#Implementation Details)
