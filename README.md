@@ -15,18 +15,23 @@ This project implements and simulates various CPU scheduling algorithms in **C++
 This project provides a simulation of different CPU scheduling algorithms to evaluate their performance based on response time, waiting time, and turnaround time. It includes a user-interactive mode where users can input process details and select the scheduling algorithm to simulate.
 
 ## Algorithms Implemented
-**First-Come, First-Serve (FCFS):** Processes are scheduled in the order they arrive.
+**First-Come, First-Serve (FCFS):** 
+
+Processes are scheduled in the order they arrive.
 Simple and straightforward, but can lead to long waiting times for processes arriving later.
 
 **Shortest Remaining Time First (SRTF):**
+
 Also known as **shortest job first preemptive(SJF)**. It always selects the process with the shortest remaining time for execution.
 Optimal for minimizing turnaround time but can cause high waiting times for longer processes.
 
 **Round Robin (RR):**
+
 Processes are assigned CPU time in a cyclic order with a fixed time quantum.
 Fair and simple, with moderate response and waiting times.
 
 **Multi-Level Feedback Queue (MLFQ):**
+
 Processes can move between multiple queues with different priority levels and time quantums. Regarding this project, it is only 2 levels.
 Balances between shorter response times for high-priority processes and fairness for longer processes.
 
