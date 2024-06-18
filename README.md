@@ -15,8 +15,7 @@ This project implements and simulates various CPU scheduling algorithms in **C++
 This project provides a simulation of different CPU scheduling algorithms to evaluate their performance based on response time, waiting time, and turnaround time. It includes a user-interactive mode where users can input process details and select the scheduling algorithm to simulate.
 
 ## Algorithms Implemented
-**First-Come, First-Serve (FCFS):**
-Processes are scheduled in the order they arrive.
+**First-Come, First-Serve (FCFS):** Processes are scheduled in the order they arrive.
 Simple and straightforward, but can lead to long waiting times for processes arriving later.
 
 **Shortest Remaining Time First (SRTF):**
