@@ -84,14 +84,28 @@ _FCFS Simulation_
 This is PID 0 at time 0
 This is PID 1 at time 4
 This is PID 2 at time 9
-```
 
 Average Turn around time = 15.6667
 Average response time = 7.66667
 Average waiting time = 7.66667
-RR Simulation
-css
-Copy code
+```
+
+_SRTF Simulation_
+```sh
+This is PID: 1 at time 1 with CPUTime 2
+preempted:
+This is PID: 2 at time 2 with CPUTime 1
+preempted:
+This is PID: 1 at time 3 with CPUTime 1
+This is PID: 3 at time 4 with CPUTime 3
+
+Average Turn around time = 2.66667
+Average response time = 0.333333
+Average waiting time = 0.666667
+```
+
+_RR Simulation_
+```sh
 This is PID 0 at time 0
 This is PID 1 at time 8
 This is PID 2 at time 16
@@ -99,9 +113,10 @@ This is PID 2 at time 16
 Average Turn around time = 17.6667
 Average response time = 8.66667
 Average waiting time = 9.66667
-MLFQ Simulation
-css
-Copy code
+```
+
+_MLFQ Simulation_
+```sh
 This is PID 0 at queue 0 at time 0
 This is PID 1 at queue 0 at time 8
 This is PID 2 at queue 0 at time 16
@@ -110,4 +125,4 @@ This is PID 0 at queue 1 at time 24
 Average Turn around time = 19.6667
 Average response time = 10.6667
 Average waiting time = 10.6667
-
+```
