@@ -31,32 +31,6 @@ Fair and simple, with moderate response and waiting times.
 Processes can move between multiple queues with different priority levels and time quantums. Regarding this project, it is only 2 levels.
 Balances between shorter response times for high-priority processes and fairness for longer processes.
 
-## Implementation Details
-
-_Process Structure_
-
-Each process is represented by a struct proc containing:
-- PID: Process ID
-- arrivalTime: Arrival time of the process
-- CPUTime: Burst time of the process
-- savedBurstTime: Original burst time for reference
-- startTime: Time at which the process starts execution
-- endTime: Time at which the process finishes execution
-
-_Scheduling Functions_
-- FCFS(): Implements the First-Come, First-Serve algorithm.
-- SJF(): Implements the Shortest Remaining Time First algorithm.
-- RR(): Implements the Round Robin algorithm with a specified time quantum.
-- MLFQ(): Implements the Multi-Level Feedback Queue algorithm with two levels and specified time quantum.
-
-_Helper Functions_
-- set_procs(): Initializes processes with random arrival and burst times, given the number of processes.
-- to_csv(): Exports results to a CSV file for further analysis.
-
-_Issues_
-
-the Shortest Remaining Time First algorithm has an issue in its implementation, that is when 2 or more processes have the same remaining execution time, the algorithm does not pick the one that arrived earlier. The choice is random, in fact.
-
 ## How to Compile and Run
 Prerequisites to compile are having a C++ compiler (e.g., g++) and the standard C++ libraries.
 
@@ -126,3 +100,29 @@ Average Turn around time = 19.6667
 Average response time = 10.6667
 Average waiting time = 10.6667
 ```
+
+## Implementation Details
+
+_Process Structure_
+
+Each process is represented by a struct proc containing:
+- PID: Process ID
+- arrivalTime: Arrival time of the process
+- CPUTime: remaining burst time during execution
+- savedBurstTime: Original burst time for calculations after simulation
+- startTime: Time at which the process starts execution
+- endTime: Time at which the process finishes execution
+
+_Scheduling Functions_
+- FCFS(): Implements the First-Come, First-Serve algorithm.
+- SJF(): Implements the Shortest Remaining Time First algorithm.
+- RR(): Implements the Round Robin algorithm with a specified time quantum.
+- MLFQ(): Implements the Multi-Level Feedback Queue algorithm with two levels and specified 2 time quantums.
+
+_Helper Functions_
+- set_procs(): Initializes processes with random arrival and burst times, given the number of processes.
+- to_csv(): Exports results to a CSV file for further analysis.
+
+_Issues_
+
+the Shortest Remaining Time First algorithm has an issue in its implementation, that is when 2 or more processes have the same remaining execution time, the algorithm does not pick the one that arrived earlier. The choice is random, in fact.
