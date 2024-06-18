@@ -33,7 +33,7 @@ Balances between shorter response times for high-priority processes and fairness
 
 ## Implementation Details
 
-1. Process Structure
+_Process Structure_
 Each process is represented by a struct proc containing:
 - PID: Process ID
 - arrivalTime: Arrival time of the process
@@ -42,17 +42,17 @@ Each process is represented by a struct proc containing:
 - startTime: Time at which the process starts execution
 - endTime: Time at which the process finishes execution
 
-2. Scheduling Functions
+_Scheduling Functions_
 - FCFS(): Implements the First-Come, First-Serve algorithm.
 - SJF(): Implements the Shortest Remaining Time First algorithm.
 - RR(): Implements the Round Robin algorithm with a specified time quantum.
 - MLFQ(): Implements the Multi-Level Feedback Queue algorithm with two levels and specified time quantum.
 
-3. Helper Functions
+_Helper Functions_
 - set_procs(): Initializes processes with random arrival and burst times, given the number of processes.
 - to_csv(): Exports results to a CSV file for further analysis.
 
-4. Issues
+_Issues_
 the Shortest Remaining Time First algorithm has an issue in its implementation, that is when 2 or more processes have the same remaining execution time, the algorithm does not pick the one that arrived earlier. The choice is random, in fact.
 
 ## How to Compile and Run
@@ -60,56 +60,18 @@ Prerequisites to compile are having a C++ compiler (e.g., g++) and the standard 
 
 Compilation:
 ``` sh
-Copy code
 g++ -o scheduler main.cpp
 ```
 
 Running the Simulation
 ``` sh
-Copy code
 ./scheduler
 ```
 ## Usage
 The program offers two modes: automated testing and user interaction.
 
-Automated Testing
+- **Automated Testing**
 In the test() function, the program automatically generates processes and runs simulations for each scheduling algorithm, recording and printing the average turnaround time, response time, and waiting time. Moreover, it generates .csv files with all the recorded time analyses. This mode is not the default, so if the user wants to try it, they should go to the int main(), comment userTest() function and uncomment test() function.
 
-User Interaction
+- **User Interaction**
 The userTest() function allows the user to select the scheduling algorithm to be simulated first. Then, the user specifies the number of processes and their arrival and burst times. This is the default mode.
-
-
-Example Output
-FCFS Simulation
-css
-Copy code
-This is PID 0 at time 0
-This is PID 1 at time 4
-This is PID 2 at time 9
-
-Average Turn around time = 15.6667
-Average response time = 7.66667
-Average waiting time = 7.66667
-RR Simulation
-css
-Copy code
-This is PID 0 at time 0
-This is PID 1 at time 8
-This is PID 2 at time 16
-
-Average Turn around time = 17.6667
-Average response time = 8.66667
-Average waiting time = 9.66667
-MLFQ Simulation
-css
-Copy code
-This is PID 0 at queue 0 at time 0
-This is PID 1 at queue 0 at time 8
-This is PID 2 at queue 0 at time 16
-This is PID 0 at queue 1 at time 24
-
-Average Turn around time = 19.6667
-Average response time = 10.6667
-Average waiting time = 10.6667
-Conclusion
-This project provides a comprehensive simulation of various CPU scheduling algorithms, allowing for performance comparison based on different metrics. It highlights the strengths and weaknesses of each algorithm and provides a hands-on approach to understanding CPU scheduling in operating systems.
