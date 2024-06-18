@@ -54,6 +54,7 @@ _Helper Functions_
 - to_csv(): Exports results to a CSV file for further analysis.
 
 _Issues_
+
 the Shortest Remaining Time First algorithm has an issue in its implementation, that is when 2 or more processes have the same remaining execution time, the algorithm does not pick the one that arrived earlier. The choice is random, in fact.
 
 ## How to Compile and Run
