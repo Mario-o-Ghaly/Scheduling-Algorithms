@@ -35,7 +35,6 @@ Balances between shorter response times for high-priority processes and fairness
 
 1. Process Structure
 Each process is represented by a struct proc containing:
-
 - PID: Process ID
 - arrivalTime: Arrival time of the process
 - CPUTime: Burst time of the process
