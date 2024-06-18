@@ -1,6 +1,6 @@
 # Scheduling-Algorithms
 
-This project implements and simulates various CPU scheduling algorithms in **C++**. The implemented algorithms include First-Come, First-Serve (FCFS), Shortest Remaining Time First (SRTF), Round Robin (RR) with a quantum of 8, and Multi-Level Feedback Queue (MLFQ) with two levels.
+This project implements and simulates various CPU scheduling algorithms in **C++**. The implemented algorithms include First-Come, First-Serve (FCFS), Shortest Remaining Time First (SRTF), Round Robin (RR), and Multi-Level Feedback Queue (MLFQ) with two levels.
 
 ## Table of Contents
 - [Description](#Description)
@@ -8,7 +8,7 @@ This project implements and simulates various CPU scheduling algorithms in **C++
 - [Implementation Details](#Implementation-Details)
 - [How to Compile and Run](#How-to-Compile-and-Run)
 - [Usage](#Usage)
-- [Example Output](#Example Output)
+- [Example Output](#Example-Output)
 
 ## Description
 
@@ -77,3 +77,37 @@ In the test() function, the program automatically generates processes and runs s
 
 - **User Interaction**
 The userTest() function allows the user to select the scheduling algorithm to be simulated first. Then, the user specifies the number of processes and their arrival and burst times. This is the default mode.
+
+## Example Output
+_FCFS Simulation_
+```sh
+This is PID 0 at time 0
+This is PID 1 at time 4
+This is PID 2 at time 9
+```
+
+Average Turn around time = 15.6667
+Average response time = 7.66667
+Average waiting time = 7.66667
+RR Simulation
+css
+Copy code
+This is PID 0 at time 0
+This is PID 1 at time 8
+This is PID 2 at time 16
+
+Average Turn around time = 17.6667
+Average response time = 8.66667
+Average waiting time = 9.66667
+MLFQ Simulation
+css
+Copy code
+This is PID 0 at queue 0 at time 0
+This is PID 1 at queue 0 at time 8
+This is PID 2 at queue 0 at time 16
+This is PID 0 at queue 1 at time 24
+
+Average Turn around time = 19.6667
+Average response time = 10.6667
+Average waiting time = 10.6667
+
